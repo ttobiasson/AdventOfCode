@@ -1,11 +1,11 @@
 import Functions
 import System.IO
-import Data.List.Split
+import Functions2
 
 main :: IO ()
 main = openFile "puzzle1.txt" ReadMode >>= 
        hGetContents >>= \numbers ->
-       print (doOperations (splitOn "," numbers) 0 [] )
+       print $ runEverything (splitOn "," numbers)
 
 doOperations :: [String] -> Int -> [String]-> [String]
 doOperations [] _ nyaList= nyaList
@@ -27,3 +27,18 @@ doOperations list n nyaList= do
 f :: String -> Int
 f s = read s :: Int
 
+
+
+
+
+
+runEverything :: [String] -> [String]
+runEverything list = do
+       case ("19690720" == show(head $ tail (doOperations list 0 [] ))) of
+          True -> [head $ tail (doOperations list 0 [] )]
+          False -> do
+            let listan1 = (setAt 2 "67" list) 
+            let listan = (setAt 1 "12" listan1)
+            (doOperations listan 0 [] )
+          
+        
