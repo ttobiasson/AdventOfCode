@@ -1,6 +1,6 @@
 import Functions
 import System.IO
-import Data.List.Split
+import Functions2
 
 main :: IO ()
 main = openFile "puzzle1.txt" ReadMode >>= 
