@@ -4,7 +4,6 @@ import Data.List.Split
 import qualified Data.List.Safe as Safe
 import Data.Char
 import Text.Read
-import Debug.Trace
 main :: IO ()
 main = openFile "puzzle1.txt" ReadMode >>= 
        hGetContents >>= \numbers ->
