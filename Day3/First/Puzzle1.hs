@@ -16,9 +16,9 @@ main = openFile "puzzle1.txt" ReadMode >>=
 h :: String -> [[(Int, Int)]] -> [(Int, Int)]
 h s l = do
     let dataPoints = map (splitOn "," ) $ lines s
-    let coords = repeated $ concat $ map g $ map (f [[(0,0)]] ) dataPoints
-    coords
-    
+    repeated $ concat $ map g $ map (f [[(0,0)]] ) dataPoints
+
+
 g :: [[(Int, Int)]] -> [(Int, Int)]
 g l = unique $ concat l
 
