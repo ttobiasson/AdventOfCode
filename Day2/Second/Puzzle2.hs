@@ -11,7 +11,7 @@ main = openFile "puzzle1.txt" ReadMode >>=
 
 doOperations :: [String] -> Int -> [String]-> [String]
 doOperations [] _ nyaList= nyaList
-doOperations list@(x:xs) n nyaList= do
+doOperations list@(x:xs) n nyaList= 
     if (n>= (length list -3)) then doOperations [] n nyaList 
     else do
         s <- (Safe.!!) list (n+1)
@@ -20,7 +20,7 @@ doOperations list@(x:xs) n nyaList= do
         let pos2 = f st
         str <- (Safe.!!) list (n+3)
         let var = f str
-        num <- (Safe.!!) list (n)
+        num <- (Safe.!!) list n
 
         p1 <- (Safe.!!) list pos1
         let posM1 = f p1
