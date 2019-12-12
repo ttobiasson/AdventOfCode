@@ -42,7 +42,26 @@ doOperations n storage = do
                         let val1 = if x == 1 then pos1 else pos1Val
                         let val2 = if z == 1 then pos2 else pos2Val
                         doOperations (n+4) . mI var (val1 * val2) $ storage
-                        
+                  | t == 5 -> do
+                        let val1 = if x == 1 then pos1 else pos1Val
+                        let val2 = if z == 1 then pos2 else pos2Val
+                        let newN = if val1 /= 0 then val2 else (n+3)
+                        doOperations newN storage
+                  | t == 6 -> do
+                        let val1 = if x == 1 then pos1 else pos1Val
+                        let val2 = if z == 1 then pos2 else pos2Val
+                        let newN = if val1 == 0 then val2 else (n+3)
+                        doOperations newN storage
+                  | t == 7 -> do
+                        let val1 = if x == 1 then pos1 else pos1Val
+                        let val2 = if z == 1 then pos2 else pos2Val
+                        let store = if val1 < val2 then mI var 1 storage else mI var 0 storage
+                        doOperations (n+4) store
+                  | t == 8 -> do
+                        let val1 = if x == 1 then pos1 else pos1Val
+                        let val2 = if z == 1 then pos2 else pos2Val
+                        let store = if val1 == val2 then mI var 1 storage else mI var 0 storage
+                        doOperations (n+4) store                        
                 
 
 
