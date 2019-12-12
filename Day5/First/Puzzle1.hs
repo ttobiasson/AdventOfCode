@@ -4,36 +4,57 @@ import Control.Monad
 import Data.List.Split
 import Debug.Trace
 import Data.Maybe
+import Data.Char
 import qualified Data.Map as Map
-main :: IO (Maybe String)
+
+type Storage = Map.Map Int String
+
+main :: IO ()
 main = openFile "puzzle1.txt" ReadMode >>= 
        hGetContents >>= \numbers ->
        let zipped = zip [0..] (splitOn "," numbers) in
-       doOperations 0 $ (Map.fromList zipped)
+       doOperations 0 (Map.fromList zipped)
         
 
-
-doOperations :: Int -> Map.Map Int String -> IO (Maybe String)
-doOperations n map = 
-    if n >= (length map -4) then 
-        pure . Map.lookup 1 $ map
+doOperations :: Int -> Storage -> IO ()
+doOperations n storage = 
+    if n >= (length storage -4) then 
+        print . mL 1 $ storage
     else do
-        let pos1 =  Map.lookup (n+1) map
-        let pos1Val = Map.lookup (read $ fromJust pos1) map
-        let pos2 = Map.lookup (n+2) map
-        let pos2Val = Map.lookup (read $ fromJust pos2) map
-        let var = Map.lookup (n+3) map
-        let varVal = Map.lookup (read $ fromJust var) map
-        let opCode = Map.lookup n map
-        let vV = read $ fromJust varVal :: Int
-        let p1 = read $ fromJust pos1 :: Int
-        let p1v = read $ fromJust pos1Val :: Int
-        let p2v = read $ fromJust pos2Val :: Int
-     
-        case fromJust opCode of 
-            "1" -> doOperations (n+4) . Map.insert vV (show(p1v + p2v)) $ map
-            "2" -> doOperations (n+4) . Map.insert vV (show(p1v * p2v)) $ map
-            "3" -> putStr "Opcode 3> " >> fmap read getLine >>= \input ->
-                    doOperations (n+4) (Map.insert p1 (trace input input) $ map)
-            "4" -> pure . Map.lookup p1 $ map
-            "99" -> pure . Map.lookup 1 $ map
+        let pos1 =  mL (n+1) storage
+        let pos1Val = mL pos1 storage
+        let pos2 = mL (n+2) storage
+        let pos2Val = mL pos2 storage
+        let var = mL (n+3) storage
+        let varVal = mL var storage
+        let opCode = extend . show . abs . mL n $ storage
+
+        case opCode of 
+            [_,_,_,3] ->    putStr "Opcode 3> " >> getLine >>= \input ->
+                            doOperations (n+2) (mI pos1 (read input) storage)
+            [_,_,_,4] -> do putStr $ "\nOpcode 4> " ++ show pos1Val
+                            doOperations (n+2) storage
+
+            [_,_,9,9] -> print . mL 1 $ storage
+            [z,x,_,t] | t == 1 -> do
+                            let val1 = if x == 1 then pos1 else pos1Val
+                            let val2 = if z == 1 then pos1 else pos1Val
+                            doOperations (n+4) . mI varVal (val1 + val2) $ storage
+                      | t == 2 -> do
+                            let val1 = if x == 1 then pos1 else pos1Val
+                            let val2 = if z == 1 then pos1 else pos1Val
+                            doOperations (n+4) . mI varVal (val1 * val2) $ storage
+                      | otherwise -> doOperations (n+4) storage
+
+
+extend :: String -> [Int]
+extend n = take (4 - length n) [0,0,0] ++ strToInt n
+
+strToInt :: String -> [Int]
+strToInt = map digitToInt
+
+mL :: Int -> Storage -> Int
+mL n s = read $ fromJust $ Map.lookup n s
+
+mI :: Int -> Int -> Storage -> Storage
+mI n n1 = Map.insert n (show n1)
