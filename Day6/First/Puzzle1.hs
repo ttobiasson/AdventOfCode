@@ -2,19 +2,19 @@ import System.IO
 import Debug.Trace
 import Data.List.Split
 import Data.List
+import qualified Data.Map as Map
 
-data Tree a = Leaf a | Node (Tree a) (Tree a) (Tree a)
-  deriving (Show, Eq)
+type Abel = Map.Map String String
 
 main :: IO ()
 main = openFile "puzzle1.txt" ReadMode >>= hGetContents >>= \input ->
-       orbits . lines $ input
+       print $ foldl (\a x -> a + ((fromIntegral $ length $ x) / 3) ) 0 $ orbits ( map (splitOn ")") $ lines $ input ) Map.empty
 
-orbits :: [String] -> IO ()
-orbits xs = do
-    let orbits = concatMap (splitOn ")") xs
-    print ""
-    
-buildOrbits :: Tree a -> Tree a
-buildOrbits (Leaf a) = undefined
-buildOrbits (Node a b c)= undefined
+orbits :: [[String]] -> Abel -> Abel
+orbits [] abel = abel
+orbits ((x:y:xs):xss) abel = do 
+    let val = orbits' x y abel
+    orbits xss val
+
+orbits' :: String -> String -> Abel -> Abel
+orbits' x y z = Map.insertWith (++) x y z
