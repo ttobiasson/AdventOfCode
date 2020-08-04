@@ -1,5 +1,6 @@
 import System.IO
 
+
 main :: IO ()
 main = openFile "puzzle1.txt" ReadMode >>= 
        hGetContents >>= \numbers ->
