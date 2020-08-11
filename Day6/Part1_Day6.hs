@@ -7,7 +7,7 @@ import qualified Data.Map as Map
 type Abel = Map.Map String Int
 
 main :: IO ()
-main = openFile "puzzle1.txt" ReadMode >>= hGetContents >>= \input ->
+main = openFile "inputDay6Part1.txt" ReadMode >>= hGetContents >>= \input ->
        print $ foldl (\a x -> a + ((fromIntegral $ x) / 3) ) 0 $ orbits ( map (splitOn ")") $ lines $ input ) Map.empty
 
 orbits :: [[String]] -> Abel -> Abel
@@ -18,3 +18,5 @@ orbits ((x:y:xs):xss) abel = do
 
 orbits' :: String -> Int -> Abel -> Abel
 orbits' = Map.insertWith (+)
+
+--Incomplete assignment
