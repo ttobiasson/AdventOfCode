@@ -8,42 +8,51 @@ import qualified Data.Map as Map
 --https://adventofcode.com/2019/day/3
 
 main :: IO ()
-main = openFile "puzzle1.txt" ReadMode >>= --Open the file containing the input
+main = openFile "inputDay3Part2.txt" ReadMode >>= --Open the file containing the input
        hGetContents >>= \numbers -> 
-       let answer = h numbers [[(0,0)]] in
+       let answer = manager numbers [[(0,0)]] in
+--Prints the answer by swapping the order of the elements so that the min function
+--can be used to find the smallest number in the list.
        print $ foldr1 min $ filter (\(n, _) -> n > 0) $ fmap (\(t, n) -> (n,t)) $ answer
 
-h :: String -> [[(Int, Int)]] -> [((Int, Int), Int)]
-h s l = do
+--Here we build the sets of data needed for the comparison that is done in the comparePaths
+--function.
+manager :: String -> [[(Int, Int)]] -> [((Int, Int), Int)]
+manager s l = do
     let dataPoints = map (splitOn "," ) $ lines s
     let intersections = repeated $ concatMap (g . f [[(0,0)]] ) dataPoints
     let points = map (concat . f [[(0,0)]]) dataPoints
-    let n1 = fseek (head points) intersections []
-    let n2 = fseek (last points) intersections []
-    ffind n1 (Map.fromList n2)
+    let n1 = buildLengths (head points) intersections []
+    let n2 = buildLengths (last points) intersections []
+    comparePaths n1 (Map.fromList n2)
 
-fseek :: [(Int, Int)] -> [(Int, Int)] -> [((Int, Int), Int)] -> [((Int, Int), Int)]
-fseek pa [] block = block
-fseek pa ((x, y):xs) block = 
-    if elem (x, y) pa then do
-                las <- Safe.last( splitOn [(x, y)] pa )
+--This function checks if the point is an intersection, if it is the length to that intersection
+--is added to the list called block. This way we reduce the complexity and save A LOT of time.
+buildLengths :: [(Int, Int)] -> [(Int, Int)] -> [((Int, Int), Int)] -> [((Int, Int), Int)]
+buildLengths coords [] block = block
+buildLengths coords ((x, y):xs) block = 
+    if elem (x, y) coords then do
+                las <- Safe.last( splitOn [(x, y)] coords )
                 let two = length las
-                fseek pa xs (((x, y), two):block)
-    else fseek pa xs block
+                buildLengths coords xs (((x, y), two):block)
+    else buildLengths coords xs block
 
-ffind :: [((Int, Int), Int)] -> Map.Map (Int, Int) Int -> [((Int, Int), Int)]
-ffind [] s = []
-ffind (((x, y), z):xs) cs =
+--Find coordinates that exists in both wire's paths. It uses a Map to search for a coordinate
+--in the path of the other wire. It saves all the recurring coordinates in a list and adds distances.
+comparePaths :: [((Int, Int), Int)] -> Map.Map (Int, Int) Int -> [((Int, Int), Int)]
+comparePaths [] s = []
+comparePaths (((x, y), z):xs) cs =
     case Map.lookup (x,y) cs of
-        Just a -> (((x, y), a+z):(ffind xs cs))
-        Nothing -> ffind xs cs
+        Just a -> (((x, y), a+z):(comparePaths xs cs))
+        Nothing -> comparePaths xs cs
 
---Remove duplate coordinates and concatinate the paths
+----Helper-function to remove duplicate coordinates and concatinate the paths
 g :: [[(Int, Int)]] -> [(Int, Int)]
 g = unique . concat  
 
 
---Build up a record of every coordinate the wires both have passed
+--Build up a record of every coordinate the wires have passed. The function does this by looking at 
+--one coordinate at a time, and updating x and y accordingly
 f :: [[(Int, Int)]] -> [String] ->[[(Int, Int)]]
 f  list [] = list
 f  list (s:ss)= do
