@@ -5,9 +5,10 @@ import Debug.Trace
 import Data.List
 import Data.List.Unique
 import qualified Data.Map as Map
+--https://adventofcode.com/2019/day/3
 
 main :: IO ()
-main = openFile "puzzle1.txt" ReadMode >>= 
+main = openFile "puzzle1.txt" ReadMode >>= --Open the file containing the input
        hGetContents >>= \numbers -> 
        let answer = h numbers [[(0,0)]] in
        print $ foldr1 min $ filter (\(n, _) -> n > 0) $ fmap (\(t, n) -> (n,t)) $ answer
@@ -37,9 +38,12 @@ ffind (((x, y), z):xs) cs =
         Just a -> (((x, y), a+z):(ffind xs cs))
         Nothing -> ffind xs cs
 
+--Remove duplate coordinates and concatinate the paths
 g :: [[(Int, Int)]] -> [(Int, Int)]
 g = unique . concat  
 
+
+--Build up a record of every coordinate the wires both have passed
 f :: [[(Int, Int)]] -> [String] ->[[(Int, Int)]]
 f  list [] = list
 f  list (s:ss)= do

@@ -6,22 +6,26 @@ import Debug.Trace
 import Data.List
 import Data.List.Unique
 import qualified Text.Read as SRead
+--https://adventofcode.com/2019/day/3
 
 main :: IO ()
-main = openFile "puzzle1.txt" ReadMode >>= 
+main = openFile "puzzle1.txt" ReadMode >>= --Open the file containing the input  
        hGetContents >>= \numbers -> 
        let answer = ( h numbers [[(0,0)]] ) in
        print $ foldr1 min $ filter (> 0) $ map (\(x, y) -> (abs x) + (abs y) ) answer
 
+--Check the datapoints for repeated coordinates; which means they are present in both wires paths
 h :: String -> [[(Int, Int)]] -> [(Int, Int)]
 h s l = do
     let dataPoints = map (splitOn "," ) $ lines s
     repeated $ concat $ map g $ map (f [[(0,0)]] ) dataPoints
 
-
+--remove duplicates
 g :: [[(Int, Int)]] -> [(Int, Int)]
 g l = unique $ concat l
 
+
+--Build up a record of every coordinate the wires have passed
 f :: [[(Int, Int)]] -> [String] ->[[(Int, Int)]]
 f  list [] = list
 f  list (s:ss)= do
